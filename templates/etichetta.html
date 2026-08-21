@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stampa Etichetta - {{ preparato.codice_lotto_interno }}</title>
+    <!-- JsBarcode per la generazione del codice a barre -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        /* Stili ottimizzati per stampante termica (es. 58mm o 80mm) */
+        @page {
+            margin: 0;
+            size: auto;
+        }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #000;
+            background-color: #fff;
+            margin: 0;
+            padding: 10px;
+            width: 72mm; /* Ottimale per rotoli da 80mm */
+            box-sizing: border-box;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .uppercase { text-transform: uppercase; }
+        
+        .header {
+            font-size: 16px;
+            font-weight: 900;
+            margin-bottom: 5px;
+            border-bottom: 2px dashed #000;
+            padding-bottom: 5px;
+        }
+        .product-name {
+            font-size: 20px;
+            font-weight: 900;
+            margin: 10px 0;
+            line-height: 1;
+        }
+        .section {
+            margin-bottom: 8px;
+        }
+        .ingredients {
+            font-size: 11px;
+            text-align: justify;
+            margin-bottom: 5px;
+        }
+        .allergens {
+            font-size: 12px;
+            font-weight: 900;
+            border: 1px solid #000;
+            padding: 3px;
+            margin-top: 5px;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .dates-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+        .barcode-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .barcode-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .print-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #1f2937;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .back-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #e5e7eb;
+            color: #374151;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        
+        /* Nasconde i pulsanti durante la stampa reale */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header text-center uppercase">
+        Macelleria Rossi<br>
+        <span style="font-size: 10px; font-weight: normal;">Sistema HACCP V2.4</span>
+    </div>
+
+    <div class="text-center">
+        <div class="product-name uppercase">{{ preparato.denominazione }}</div>
+    </div>
+
+    <div class="section ingredients">
+        <span class="font-bold">Ingredienti:</span> {{ ingredienti }}
+    </div>
+
+    {% if allergeni %}
+    <div class="section allergens text-center">
+        CONTIENE ALLERGENI: <br>
+        {{ allergeni | join(', ') }}
+    </div>
+    {% endif %}
+
+    <div class="dates-grid font-bold">
+        <div>
+            <div style="font-size: 10px; font-weight: normal;">Confezionato il:</div>
+            {{ preparato.data_lavorazione.strftime('%d/%m/%Y') }}
+        </div>
+        <div class="text-right">
+            <div style="font-size: 10px; font-weight: normal;">Da cons. entro:</div>
+            {{ preparato.data_scadenza_preparato.strftime('%d/%m/%Y') }}
+        </div>
+    </div>
+
+    <div class="barcode-container">
+        <svg id="barcode"></svg>
+    </div>
+    
+    <div class="text-center font-bold" style="font-size: 10px; margin-top: 5px;">
+        Lotto: {{ preparato.codice_lotto_interno }}
+    </div>
+
+    <!-- UI Controlli per il Touch Screen -->
+    <div class="no-print" style="margin-top: 30px;">
+        <button onclick="window.print()" class="print-btn">🖨️ Stampa Etichetta</button>
+        <a href="/" class="back-btn">⬅️ Torna alla Vetrina</a>
+    </div>
+
+    <script>
+        // Genera il codice a barre all'avvio
+        JsBarcode("#barcode", "{{ preparato.codice_lotto_interno }}", {
+            format: "CODE128",
+            width: 2,
+            height: 50,
+            displayValue: false, // Il valore testuale è già mostrato in chiaro sotto
+            margin: 0
+        });
+        
+        // Auto-avvia la stampa non appena la pagina è caricata
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>
