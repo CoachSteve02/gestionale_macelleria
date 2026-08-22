@@ -1,31 +1,39 @@
 # Sentinel Handoff Report
 
-**Project**: Gestionale Macelleria — Dead Code & Architecture Analysis  
-**Date**: 2026-08-20  
+**Project**: Gestionale Macelleria — Residual Fixes & Schema Alignment (R1, R2, R3)  
+**Date**: 2026-08-22  
 **Status**: VICTORY CONFIRMED  
-**Deliverable**: `C:\Users\david\.gemini\antigravity\brain\417b37a5-594d-4b26-8aae-a3a1bc58b9a5\dead_code_report.md`  
+**Deliverables**:
+- `.env.example`
+- `database.sql` (aligned DMLs)
+- `README.md` (updated Excel generation docs)
 
 ---
 
 ## 1. Observation
-The user requested a deep, compartmentalized dead code and unused asset analysis of the repository `Gestionale_Macelleria` without modifying or deleting any files. A team of specialist subagents was orchestrated to investigate backend Python/Flask (`app.py`), database schema (`database.sql`), Jinja2 templates (`templates/`), frontend assets (`src/`, `static/`), and dependency configs (`package.json`, etc.). An independent Victory Auditor verified all claims against the repository and confirmed zero file alterations.
+The user requested 3 targeted residual fixes identified from previous analysis:
+1. R1: Creation of `.env.example` with `DATABASE_URL` and `SECRET_KEY` template variables and Italian comments.
+2. R2: Aligning `database.sql` DMLs with actual database schema (removing `flg_lotto_del_giorno` from LOTTO_MADRE DML, removing `versione` from 4 RICETTA INSERTs, and replacing `'LOTTO_DEFAULT'` with regex-safe `'LOTTO-DEFAULT'`).
+3. R3: Updating `README.md` to reflect on-demand Excel HACCP generation upon download.
+Integrity constraints required that `app.py` and other files remain untouched.
 
 ## 2. Logic Chain
-1. Original request was recorded in `.agents/ORIGINAL_REQUEST.md`.
-2. Execution routed to the General Project Orchestrator (`teamwork_preview_orchestrator`).
-3. Orchestrator decomposed the task across Backend Survey, Frontend Survey, Asset Survey, Reviewers, Adversarial Challenger, and Integrity Auditor.
-4. Comprehensive findings were synthesized into `dead_code_report.md`.
-5. Upon victory claim, an independent `teamwork_preview_victory_auditor` was spawned for a blocking 3-phase audit (Timeline analysis, Integrity check, Independent verification of code/schema references).
-6. The Victory Auditor confirmed all acceptance criteria with verdict `VICTORY CONFIRMED`.
-7. All monitoring crons were cancelled and all subagents terminated per protocol.
+1. Recorded request in `.agents/ORIGINAL_REQUEST.md`.
+2. Evaluated routing: matched SWE Light (`teamwork_preview_swe`) due to explicit user instruction ("single self-contained fix; keep it small and focused").
+3. Dispatched `teamwork_preview_swe` which ran implementation followed by 3 rounds of adversarial review.
+4. Active liveness and progress crons monitored subagent progress.
+5. Upon victory claim from `teamwork_preview_swe`, Sentinel dispatched an independent `teamwork_preview_victory_auditor` for a blocking 3-phase audit.
+6. Victory Auditor confirmed 100% compliance across all requirements and repository integrity with `VERDICT: VICTORY CONFIRMED`.
+7. Cancelled all monitoring crons and terminated all subagents per protocol.
 
 ## 3. Caveats & Critical Notes
-- **Zombie Column Warning**: The database column `LOTTO_MADRE.flg_lotto_del_giorno` is read in two Python queries (`app.py:84, 324`) but is never written to `TRUE`. Dropping this column from `database.sql` without first refactoring the Python queries will cause runtime `UndefinedColumn` errors.
-- **Dual-Stack Scaffolding**: The React/TypeScript files in `src/` are Google AI Studio prototype artifacts that do not run the production application. They can be safely archived or maintained separately without affecting the core Flask app.
+- The DDL for `LOTTO_MADRE` still contains `flg_lotto_del_giorno` definition for backwards compatibility with `app.py`, while DML inserts have been cleanly adapted.
+- `app.py` was strictly preserved without any alterations.
 
 ## 4. Conclusion
-All acceptance criteria specified in `ORIGINAL_REQUEST.md` have been met. The final audit report `dead_code_report.md` is available in the artifact repository.
+All acceptance criteria for R1, R2, and R3 have been satisfied and independently verified.
 
 ## 5. Verification Method
-- Independent static code search and cross-referencing across all 22 project files.
-- Victory audit logs available in `.agents/victory_auditor/handoff.md`.
+- Independent post-victory audit (timeline review, full diff integrity scan, static schema/DML/regex checks).
+- Full audit report at `C:\Users\david\Desktop\Gestionale_Macelleria\.agents\victory_auditor_sentinel\handoff.md`.
+

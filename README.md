@@ -1,13 +1,13 @@
 # Gestionale Macelleria (HACCP)
 
-Sistema di tracciabilità alimentare HACCP e gestione magazzino per macelleria, con export automatico su Excel e stampa etichette termiche.
+Sistema di tracciabilità alimentare HACCP e gestione magazzino per macelleria, con export on-demand su Excel e stampa etichette termiche.
 
 ## Stack tecnologico
 
 - **Backend:** Python 3 / Flask
 - **Database:** PostgreSQL
 - **Template engine:** Jinja2 (HTML server-side, ottimizzato per touch screen da banco)
-- **Export dati:** Pandas + openpyxl (genera `Registro_Tracciabilita_Macelleria.xlsx`)
+- **Export dati:** Pandas + openpyxl (genera su richiesta `Registro_Tracciabilita_<Mese>_<Anno>.xlsx`)
 - **Etichette:** stampa termica via browser, codici a barre generati con JsBarcode
 
 > Nota: questo repository include anche una piccola app React/Vite (`src/`) generata automaticamente da Google AI Studio come ambiente di sviluppo iniziale. **Non è l'applicazione reale**: mostra solo una pagina riassuntiva dell'architettura Flask. L'app vera è quella descritta di seguito.
@@ -70,9 +70,9 @@ templates/
 - **Produzione preparati**: un click genera automaticamente il lotto interno, associa i lotti fornitore usati per ogni ingrediente della ricetta (tracciabilità HACCP) e reindirizza alla stampa etichetta.
 - **Magazzino**: elenco di tutte le giacenze con stato e azioni rapide.
 - **Etichette**: stampa termica con codice a barre, ingredienti in ordine di quantità e allergeni evidenziati.
-- **Export Excel automatico**: ad ogni operazione di carico o produzione, viene rigenerato `Registro_Tracciabilita_Macelleria.xlsx` con tre fogli (carichi, preparati, registro HACCP completo).
+- **Export Excel on-demand**: generazione su richiesta del registro mensile HACCP scaricabile direttamente dall'applicazione (`Registro_Tracciabilita_<Mese>_<Anno>.xlsx`), suddiviso in tre fogli (*Carichi_Magazzino*, *Prodotti_Preparati*, *Registro_HACCP_Completo*).
 
 ## Note
 
-- Il file Excel viene sovrascritto interamente ad ogni operazione di scrittura, non aggiornato in modo incrementale.
+- Il file Excel viene generato on-demand al momento del download per il mese corrente (non viene rigenerato automaticamente ad ogni singola operazione di carico o produzione).
 - L'operatore di sessione è attualmente fisso ("Operatore Banco"); non è presente un sistema di login/autenticazione multi-operatore.

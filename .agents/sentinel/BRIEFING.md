@@ -1,27 +1,28 @@
-# BRIEFING — 2026-08-20T20:16:47Z
+# BRIEFING — 2026-08-22T15:47:20Z
 
 ## Mission
-Coordinate and monitor comprehensive dead code, unused file, and obsolete feature analysis of Gestionale_Macelleria and ensure dead_code_report.md artifact generation.
+Coordinate and monitor SWE Light execution of 3 residue fixes (.env.example, database.sql schema alignment, README.md Excel generation) for Gestionale_Macelleria and ensure mandatory independent victory audit.
 
 ## 🔒 My Identity
 - Archetype: sentinel
 - Working directory: C:\Users\david\Desktop\Gestionale_Macelleria\.agents\sentinel
-- Orchestrator: 417b37a5-594d-4b26-8aae-a3a1bc58b9a5 (Completed & Cleaned up)
-- Victory Auditor: 03219559-3f3d-460f-9e78-199f2a5084fe (Completed & Cleaned up)
+- Orchestrator: 08d0898c-78c1-41d5-9717-8392278db6e1 (Completed & Cleaned up)
+- Victory Auditor: 8bfa4715-df4e-4e4b-a4f4-c6b995cfb808 (Completed & Cleaned up)
 
 ## 🔒 Key Constraints
 - No technical decisions — relay only
 - Victory Audit is MANDATORY before reporting completion
-- No files or code must be deleted or altered in the original repository
-- Read-only analysis with final report artifact dead_code_report.md
+- Route to teamwork_preview_swe per explicit user signal for small/focused fix
+- Only touch the specified files (.env.example, database.sql, README.md); do NOT modify app.py or any other files
 
 ## User Context
-- **Last user request**: Deep dead code analysis of backend, database, frontend, and static assets with dead_code_report.md artifact.
+- **Last user request**: 3 residual fixes: create .env.example, align database.sql DMLs (remove flg_lotto_del_giorno, remove versione, replace LOTTO_DEFAULT with regex-safe LOTTO-DEFAULT), update README.md on-demand Excel generation.
 - **Pending clarifications**: none
-- **Delivered results**: dead_code_report.md generated and independently verified with VICTORY CONFIRMED.
+- **Delivered results**: 3 residual fixes applied, reviewed across 3 rounds, independently audited and verified with VICTORY CONFIRMED.
 
 ## Project Status
 - **Phase**: complete
+- **Route**: teamwork_preview_swe (SWE Light)
 
 ## Victory Audit Status
 - **Triggered**: yes
@@ -30,5 +31,6 @@ Coordinate and monitor comprehensive dead code, unused file, and obsolete featur
 
 ## Artifact Index
 - C:\Users\david\Desktop\Gestionale_Macelleria\.agents\ORIGINAL_REQUEST.md — Authoritative record of user intent
-- C:\Users\david\.gemini\antigravity\brain\417b37a5-594d-4b26-8aae-a3a1bc58b9a5\dead_code_report.md — Dead Code & Architecture Report
+- C:\Users\david\Desktop\Gestionale_Macelleria\.agents\sentinel\BRIEFING.md — Sentinel briefing
 - C:\Users\david\Desktop\Gestionale_Macelleria\.agents\sentinel\handoff.md — Sentinel handoff summary
+

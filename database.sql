@@ -115,7 +115,7 @@ INSERT INTO ARTICOLO (denominazione, categoria, allergeni, tipo_categoria) VALUE
 
 -- Popola RICETTA e RICETTA_RIGA
 -- Ricetta Polpette di Carne
-INSERT INTO RICETTA (id_articolo_preparato, versione, attiva) VALUES ((SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Polpette di Carne'), 1, TRUE);
+INSERT INTO RICETTA (id_articolo_preparato, attiva) VALUES ((SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Polpette di Carne'), TRUE);
 INSERT INTO RICETTA_RIGA (id_ricetta, id_articolo_ingrediente, ordine_etichetta) VALUES 
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Polpette di Carne')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Carne Macinata Bovino'), 1),
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Polpette di Carne')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Pane Grattugiato'), 2),
@@ -123,7 +123,7 @@ INSERT INTO RICETTA_RIGA (id_ricetta, id_articolo_ingrediente, ordine_etichetta)
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Polpette di Carne')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Sale Marino Fine'), 4);
 
 -- Ricetta Bombette Pugliesi
-INSERT INTO RICETTA (id_articolo_preparato, versione, attiva) VALUES ((SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Bombette Pugliesi'), 1, TRUE);
+INSERT INTO RICETTA (id_articolo_preparato, attiva) VALUES ((SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Bombette Pugliesi'), TRUE);
 INSERT INTO RICETTA_RIGA (id_ricetta, id_articolo_ingrediente, ordine_etichetta) VALUES 
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Bombette Pugliesi')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Capocollo di Maiale'), 1),
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Bombette Pugliesi')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Formaggio Caciocavallo'), 2),
@@ -131,19 +131,19 @@ INSERT INTO RICETTA_RIGA (id_ricetta, id_articolo_ingrediente, ordine_etichetta)
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Bombette Pugliesi')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Pepe Nero Macinato'), 4);
 
 -- Ricetta Hamburger Classico
-INSERT INTO RICETTA (id_articolo_preparato, versione, attiva) VALUES ((SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Hamburger Classico'), 1, TRUE);
+INSERT INTO RICETTA (id_articolo_preparato, attiva) VALUES ((SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Hamburger Classico'), TRUE);
 INSERT INTO RICETTA_RIGA (id_ricetta, id_articolo_ingrediente, ordine_etichetta) VALUES 
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Hamburger Classico')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Carne Macinata Bovino'), 1),
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Hamburger Classico')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Sale Marino Fine'), 2);
 
 -- Ricetta Salsiccia Fresca
-INSERT INTO RICETTA (id_articolo_preparato, versione, attiva) VALUES ((SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Salsiccia Fresca'), 1, TRUE);
+INSERT INTO RICETTA (id_articolo_preparato, attiva) VALUES ((SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Salsiccia Fresca'), TRUE);
 INSERT INTO RICETTA_RIGA (id_ricetta, id_articolo_ingrediente, ordine_etichetta) VALUES 
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Salsiccia Fresca')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Capocollo di Maiale'), 1),
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Salsiccia Fresca')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Budello Naturale'), 2),
 ((SELECT id_ricetta FROM RICETTA WHERE id_articolo_preparato = (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Salsiccia Fresca')), (SELECT id_articolo FROM ARTICOLO WHERE denominazione = 'Sale Marino Fine'), 3);
 
 -- Popola LOTTO_MADRE per articoli VARI come lotto del giorno
-INSERT INTO LOTTO_MADRE (id_articolo, codice_lotto_fornitore, fornitore, data_scadenza, flg_lotto_del_giorno)
-SELECT id_articolo, 'LOTTO_DEFAULT', 'Fornitore Interno', CURRENT_DATE + INTERVAL '1 year', TRUE
+INSERT INTO LOTTO_MADRE (id_articolo, codice_lotto_fornitore, fornitore, data_scadenza)
+SELECT id_articolo, 'LOTTO-DEFAULT', 'Fornitore Interno', CURRENT_DATE + INTERVAL '1 year'
 FROM ARTICOLO WHERE tipo_categoria = 'VARIO';
