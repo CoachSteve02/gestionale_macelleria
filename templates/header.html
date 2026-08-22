@@ -63,8 +63,12 @@
             {% endwith %}
 
             <!-- Barra di ricerca -->
-            <div class="relative w-full">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-3xl">search</span>
-                <input type="text" id="searchInput" placeholder="Ricerca rapida al banco (es. Macinata, Hamburger...)" class="w-full pl-14 pr-4 py-4 text-xl font-bold bg-white border-2 border-slate-300 rounded-xl focus:border-slate-800 focus:outline-none shadow-sm transition-colors text-slate-800 placeholder-slate-400">
+            {% if request.endpoint == 'index' %}
+            <div class="relative w-full max-w-md hidden sm:block">
+                <div class="relative w-full">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-3xl">search</span>
+                    <input type="text" id="searchInput" placeholder="Ricerca rapida al banco (es. Macinata, Hamburger...)" class="w-full pl-14 pr-4 py-4 text-xl font-bold bg-white border-2 border-slate-300 rounded-xl focus:border-slate-800 focus:outline-none shadow-sm transition-colors text-slate-800 placeholder-slate-400">
+                </div>
             </div>
+            {% endif %}
         </div>

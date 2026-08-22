@@ -1,7 +1,6 @@
 import os
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
-import psycopg2
 from psycopg2.pool import SimpleConnectionPool
 from psycopg2.extras import RealDictCursor
 import pandas as pd
@@ -81,7 +80,7 @@ def aggiorna_file_excel():
     query_carichi = """
         SELECT id_lotto_madre, id_articolo, codice_lotto_fornitore, fornitore,
                data_carico, data_scadenza, paese_nascita, paese_allevamento,
-               paese_macellazione, paese_sezionamento, flg_lotto_del_giorno
+               paese_macellazione, paese_sezionamento
         FROM LOTTO_MADRE
         WHERE data_carico >= %s AND data_carico < %s
         ORDER BY data_carico DESC
@@ -299,9 +298,15 @@ def produci_preparato(id_articolo):
             # Calcolo scadenza (es. +3 giorni per i preparati freschi)
             scadenza = datetime.datetime.now().date() + datetime.timedelta(days=3)
             
-            # 3. Creazione o recupero sessione lavorazione (usiamo una sessione generica del giorno o ne creiamo una)
-            cursor.execute("INSERT INTO SESSIONE_LAVORAZIONE (operatore) VALUES ('Operatore Banco') RETURNING id_sessione")
-            id_sessione = cursor.fetchone()['id_sessione']
+            # 3. Creazione o recupero sessione lavorazione
+            cursor.execute("SELECT id_sessione FROM SESSIONE_LAVORAZIONE WHERE stato_sessione = 'Aperta' ORDER BY data_ora_inizio DESC LIMIT 1")
+            sessione_attiva = cursor.fetchone()
+            
+            if sessione_attiva:
+                id_sessione = sessione_attiva['id_sessione']
+            else:
+                cursor.execute("INSERT INTO SESSIONE_LAVORAZIONE (operatore) VALUES ('Operatore Banco') RETURNING id_sessione")
+                id_sessione = cursor.fetchone()['id_sessione']
             
             # 4. Inserimento in LOTTO_PREPARATO
             cursor.execute("""
@@ -321,8 +326,8 @@ def produci_preparato(id_articolo):
                 # Cerca lotto madre: prima quelli del giorno, poi i più recenti caricati in generale
                 cursor.execute("""
                     SELECT id_lotto_madre FROM LOTTO_MADRE 
-                    WHERE id_articolo = %s AND (flg_lotto_del_giorno = TRUE OR data_scadenza >= CURRENT_DATE)
-                    ORDER BY flg_lotto_del_giorno DESC, data_carico DESC LIMIT 1
+                    WHERE id_articolo = %s AND data_scadenza >= CURRENT_DATE
+                    ORDER BY data_carico DESC LIMIT 1
                 """, (id_ing,))
                 lotto_madre = cursor.fetchone()
                 
@@ -332,8 +337,12 @@ def produci_preparato(id_articolo):
                         VALUES (%s, %s, %s)
                     """, (id_lotto_preparato, lotto_madre['id_lotto_madre'], "Assegnazione automatica banco"))
                 else:
-                    # Registra tracciabilità mancante/vuota se l'ingrediente manca dal magazzino
-                    pass 
+                    # Registra tracciabilità mancante se l'ingrediente manca dal magazzino
+                    app.logger.warning(f"Lotto madre mancante per l'ingrediente ID {id_ing} nel preparato {id_lotto_preparato}")
+                    cursor.execute("""
+                        INSERT INTO COMPOSIZIONE_LAVORAZIONE (id_lotto_preparato, id_lotto_madre, note_associazione)
+                        VALUES (%s, NULL, %s)
+                    """, (id_lotto_preparato, f"Allerta HACCP: lotto mancante per ingrediente {id_ing}"))
             
             conn.commit()
             flash(f'Preparato prodotto con successo. Lotto: {codice_lotto_interno}', 'success')

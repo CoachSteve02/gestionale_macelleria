@@ -2,7 +2,16 @@ node_modules/
 build/
 dist/
 coverage/
-.DS_Store
+.DS_Store+
 *.log
 .env*
 !.env.example
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+*.xlsx
+*.log

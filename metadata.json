@@ -1,6 +1,0 @@
-{
-  "name": "Gestionale Macelleria",
-  "description": "Sistema di tracciabilità alimentare HACCP e gestione magazzino macelleria, con esportazione in Excel e backend Python/Flask.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
