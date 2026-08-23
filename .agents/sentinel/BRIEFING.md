@@ -1,28 +1,28 @@
-# BRIEFING — 2026-08-22T15:47:20Z
+# BRIEFING — 2026-08-23T10:57:09Z
 
 ## Mission
-Coordinate and monitor SWE Light execution of 3 residue fixes (.env.example, database.sql schema alignment, README.md Excel generation) for Gestionale_Macelleria and ensure mandatory independent victory audit.
+Coordinate and monitor General SWE execution for making the "Carico Merci" form dynamic with HACCP meat traceability rules in Gestionale_Macelleria, and ensure mandatory independent victory audit.
 
 ## 🔒 My Identity
 - Archetype: sentinel
 - Working directory: C:\Users\david\Desktop\Gestionale_Macelleria\.agents\sentinel
-- Orchestrator: 08d0898c-78c1-41d5-9717-8392278db6e1 (Completed & Cleaned up)
-- Victory Auditor: 8bfa4715-df4e-4e4b-a4f4-c6b995cfb808 (Completed & Cleaned up)
+- Orchestrator: 09d1bc6c-4840-4880-8c86-10aacc9a7bdd
+- Victory Auditor: 9ad7ef83-74a8-4749-8596-5b33899a3918
 
 ## 🔒 Key Constraints
 - No technical decisions — relay only
 - Victory Audit is MANDATORY before reporting completion
-- Route to teamwork_preview_swe per explicit user signal for small/focused fix
-- Only touch the specified files (.env.example, database.sql, README.md); do NOT modify app.py or any other files
+- Route to teamwork_preview_orchestrator (General path)
+- Verification via running Flask app & checking routes/DB
 
 ## User Context
-- **Last user request**: 3 residual fixes: create .env.example, align database.sql DMLs (remove flg_lotto_del_giorno, remove versione, replace LOTTO_DEFAULT with regex-safe LOTTO-DEFAULT), update README.md on-demand Excel generation.
+- **Last user request**: Make "Carico Merci" page dynamic (client-side show/hide for meat traceability categories Bovino/Suino/Avicolo), DB migration for data_macellazione, backend validation in /salva_carico, distinct HACCP visual styling.
 - **Pending clarifications**: none
-- **Delivered results**: 3 residual fixes applied, reviewed across 3 rounds, independently audited and verified with VICTORY CONFIRMED.
+- **Delivered results**: Dynamic Carico Merci form (pure client-side show/hide for Bovino/Suino/Avicolo via vanilla JS & data-categoria), database migration for data_macellazione, backend conditional validation in /salva_carico, distinct Tailwind HACCP UI section, full non-regression checks across all routes.
 
 ## Project Status
 - **Phase**: complete
-- **Route**: teamwork_preview_swe (SWE Light)
+- **Route**: teamwork_preview_orchestrator (General)
 
 ## Victory Audit Status
 - **Triggered**: yes
@@ -31,6 +31,5 @@ Coordinate and monitor SWE Light execution of 3 residue fixes (.env.example, dat
 
 ## Artifact Index
 - C:\Users\david\Desktop\Gestionale_Macelleria\.agents\ORIGINAL_REQUEST.md — Authoritative record of user intent
-- C:\Users\david\Desktop\Gestionale_Macelleria\.agents\sentinel\BRIEFING.md — Sentinel briefing
-- C:\Users\david\Desktop\Gestionale_Macelleria\.agents\sentinel\handoff.md — Sentinel handoff summary
+- C:\Users\david\Desktop\Gestionale_Macelleria\.agents\sentinel\BRIEFING.md — Sentinel persistent working memory
 

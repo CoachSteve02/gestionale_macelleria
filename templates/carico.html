@@ -7,7 +7,7 @@
                     <h2 class='font-black text-slate-800 uppercase tracking-tighter text-2xl'>Nuovo Carico Merce</h2> 
                 </div> 
 
-                <form action="{{ url_for('salva_carico') }}" method="POST" class="space-y-6">
+                <form id="form-carico" action="{{ url_for('salva_carico') }}" method="POST" class="space-y-6">
                     
                     <div class="flex flex-col">
                         <label for="id_articolo" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-sm">Prodotto (Solo Tagli e Vari)</label>
@@ -16,7 +16,7 @@
                             {% for categoria, articoli in articoli_per_categoria.items() %}
                                 <optgroup label="{{ categoria }}" class="font-bold text-slate-900 bg-slate-200">
                                     {% for art in articoli %}
-                                        <option value="{{ art.id_articolo }}" class="font-normal text-slate-800 bg-white">{{ art.denominazione }}</option>
+                                        <option value="{{ art.id_articolo }}" data-categoria="{{ categoria }}" class="font-normal text-slate-800 bg-white">{{ art.denominazione }}</option>
                                     {% endfor %}
                                 </optgroup>
                             {% endfor %}
@@ -42,22 +42,42 @@
                         <input type="date" id="data_scadenza" name="data_scadenza" required class="p-4 border-2 border-slate-300 rounded-lg bg-slate-50 focus:border-slate-800 focus:ring-0 focus:outline-none text-lg">
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="flex flex-col">
-                            <label for="paese_nascita" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Nato in</label>
-                            <input type="text" id="paese_nascita" name="paese_nascita" placeholder="Es. ITA" class="p-3 border-2 border-slate-300 rounded-lg bg-slate-50 focus:border-slate-800 focus:ring-0 focus:outline-none text-md">
+                    <!-- Sezione Dinamica Tracciabilità Carne (HACCP) -->
+                    <div id="sezione-tracciabilita" class="hidden bg-red-50/50 border-2 border-red-300 rounded-xl p-6 space-y-4 transition-all">
+                        <div class="flex items-center justify-between border-b border-red-200 pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">🥩</span>
+                                <div>
+                                    <h3 class="font-bold text-red-900 text-lg uppercase tracking-wide">Tracciabilità Carne • Dati HACCP</h3>
+                                    <p class="text-xs text-red-600 font-medium">Campi obbligatori per carni fresche (Bovino, Suino, Avicolo)</p>
+                                </div>
+                            </div>
+                            <span class="bg-red-200 text-red-800 text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wider">Obbligatorio</span>
                         </div>
-                        <div class="flex flex-col">
-                            <label for="paese_allevamento" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Allevato in</label>
-                            <input type="text" id="paese_allevamento" name="paese_allevamento" placeholder="Es. ITA" class="p-3 border-2 border-slate-300 rounded-lg bg-slate-50 focus:border-slate-800 focus:ring-0 focus:outline-none text-md">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex flex-col">
+                                <label for="paese_nascita" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Nato in <span class="text-red-600">*</span></label>
+                                <input type="text" id="paese_nascita" name="paese_nascita" placeholder="Es. ITA" class="p-3 border-2 border-slate-300 rounded-lg bg-white focus:border-red-600 focus:ring-0 focus:outline-none text-md">
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="paese_allevamento" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Allevato in <span class="text-red-600">*</span></label>
+                                <input type="text" id="paese_allevamento" name="paese_allevamento" placeholder="Es. ITA" class="p-3 border-2 border-slate-300 rounded-lg bg-white focus:border-red-600 focus:ring-0 focus:outline-none text-md">
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="paese_macellazione" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Macellato in <span class="text-red-600">*</span></label>
+                                <input type="text" id="paese_macellazione" name="paese_macellazione" placeholder="Es. ITA o IT-123" class="p-3 border-2 border-slate-300 rounded-lg bg-white focus:border-red-600 focus:ring-0 focus:outline-none text-md">
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="paese_sezionamento" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Sezionato in <span class="text-red-600">*</span></label>
+                                <input type="text" id="paese_sezionamento" name="paese_sezionamento" placeholder="Es. ITA o IT-456" class="p-3 border-2 border-slate-300 rounded-lg bg-white focus:border-red-600 focus:ring-0 focus:outline-none text-md">
+                            </div>
                         </div>
-                        <div class="flex flex-col">
-                            <label for="paese_macellazione" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Macellato in</label>
-                            <input type="text" id="paese_macellazione" name="paese_macellazione" placeholder="Es. ITA o IT-123" class="p-3 border-2 border-slate-300 rounded-lg bg-slate-50 focus:border-slate-800 focus:ring-0 focus:outline-none text-md">
-                        </div>
-                        <div class="flex flex-col">
-                            <label for="paese_sezionamento" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Sezionato in</label>
-                            <input type="text" id="paese_sezionamento" name="paese_sezionamento" placeholder="Es. ITA o IT-456" class="p-3 border-2 border-slate-300 rounded-lg bg-slate-50 focus:border-slate-800 focus:ring-0 focus:outline-none text-md">
+
+                        <div class="flex flex-col pt-2 border-t border-red-100">
+                            <label for="data_macellazione" class="font-bold text-slate-700 mb-2 uppercase tracking-wide text-xs">Data Macellazione</label>
+                            <input type="date" id="data_macellazione" name="data_macellazione" class="p-3 border-2 border-slate-300 rounded-lg bg-white focus:border-red-600 focus:ring-0 focus:outline-none text-md">
+                            <span class="text-xs text-slate-500 mt-1">Obbligatoria se non è specificata la data di scadenza.</span>
                         </div>
                     </div>
 
@@ -71,5 +91,68 @@
             </section> 
 
         </main> 
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const selectArticolo = document.getElementById('id_articolo');
+                const sezioneTracciabilita = document.getElementById('sezione-tracciabilita');
+                const inputScadenza = document.getElementById('data_scadenza');
+                const inputMacellazione = document.getElementById('data_macellazione');
+                const countryInputs = [
+                    document.getElementById('paese_nascita'),
+                    document.getElementById('paese_allevamento'),
+                    document.getElementById('paese_macellazione'),
+                    document.getElementById('paese_sezionamento')
+                ];
+                
+                const categorieCarne = ['bovino', 'suino', 'avicolo'];
+
+                function aggiornaVisibilitaTracciabilita() {
+                    const selectedOption = selectArticolo.options[selectArticolo.selectedIndex];
+                    const categoria = (selectedOption && selectedOption.dataset.categoria) ? selectedOption.dataset.categoria.toLowerCase().trim() : '';
+                    const isCarne = categorieCarne.includes(categoria);
+
+                    if (isCarne) {
+                        sezioneTracciabilita.classList.remove('hidden');
+                        countryInputs.forEach(input => {
+                            input.required = true;
+                        });
+                        inputScadenza.required = false;
+                    } else {
+                        sezioneTracciabilita.classList.add('hidden');
+                        countryInputs.forEach(input => {
+                            input.required = false;
+                            input.value = '';
+                        });
+                        inputMacellazione.value = '';
+                        inputScadenza.required = true;
+                    }
+                }
+
+                selectArticolo.addEventListener('change', aggiornaVisibilitaTracciabilita);
+
+                // Esegui all'avvio per allineare lo stato iniziale
+                aggiornaVisibilitaTracciabilita();
+
+                // Validazione client-side prima del submit
+                const form = document.getElementById('form-carico');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        const selectedOption = selectArticolo.options[selectArticolo.selectedIndex];
+                        const categoria = (selectedOption && selectedOption.dataset.categoria) ? selectedOption.dataset.categoria.toLowerCase().trim() : '';
+                        const isCarne = categorieCarne.includes(categoria);
+
+                        if (isCarne) {
+                            if (!inputScadenza.value && !inputMacellazione.value) {
+                                e.preventDefault();
+                                alert('Per le categorie carni è obbligatorio inserire almeno una data tra Data Macellazione e Data di Scadenza.');
+                                inputMacellazione.focus();
+                                return false;
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
 
 {% include 'footer.html' %}

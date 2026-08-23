@@ -36,6 +36,24 @@ db_pool = SimpleConnectionPool(
     dsn=os.environ.get('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/gestionale_macelleria_dev')
 )
 
+def init_db_migrations():
+    """Esegue migrazioni DDL idempotenti all'avvio dell'applicazione."""
+    try:
+        conn = db_pool.getconn()
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    ALTER TABLE LOTTO_MADRE ADD COLUMN IF NOT EXISTS data_macellazione DATE;
+                    ALTER TABLE LOTTO_MADRE ALTER COLUMN data_scadenza DROP NOT NULL;
+                """)
+            conn.commit()
+        finally:
+            db_pool.putconn(conn)
+    except Exception as e:
+        app.logger.warning(f"Migrazione DB non eseguita o database non raggiungibile: {e}")
+
+init_db_migrations()
+
 def get_db_connection():
     conn = db_pool.getconn()
     return conn
@@ -79,7 +97,7 @@ def aggiorna_file_excel():
 
     query_carichi = """
         SELECT id_lotto_madre, id_articolo, codice_lotto_fornitore, fornitore,
-               data_carico, data_scadenza, paese_nascita, paese_allevamento,
+               data_carico, data_scadenza, data_macellazione, paese_nascita, paese_allevamento,
                paese_macellazione, paese_sezionamento
         FROM LOTTO_MADRE
         WHERE data_carico >= %s AND data_carico < %s
@@ -213,41 +231,94 @@ def carico():
 
 @app.route('/salva_carico', methods=['POST'])
 def salva_carico():
-    id_articolo = request.form.get('id_articolo')
-    codice_lotto_fornitore = request.form.get('codice_lotto_fornitore')
-    fornitore = request.form.get('fornitore')
-    data_scadenza = request.form.get('data_scadenza')
-    paese_nascita = request.form.get('paese_nascita')
-    paese_allevamento = request.form.get('paese_allevamento')
-    paese_macellazione = request.form.get('paese_macellazione')
-    paese_sezionamento = request.form.get('paese_sezionamento')
+    id_articolo = (request.form.get('id_articolo') or '').strip() or None
+    codice_lotto_fornitore = (request.form.get('codice_lotto_fornitore') or '').strip() or None
+    fornitore = (request.form.get('fornitore') or '').strip() or None
+    data_scadenza_str = (request.form.get('data_scadenza') or '').strip() or None
+    data_macellazione_str = (request.form.get('data_macellazione') or '').strip() or None
+    paese_nascita = (request.form.get('paese_nascita') or '').strip() or None
+    paese_allevamento = (request.form.get('paese_allevamento') or '').strip() or None
+    paese_macellazione = (request.form.get('paese_macellazione') or '').strip() or None
+    paese_sezionamento = (request.form.get('paese_sezionamento') or '').strip() or None
 
-    if not all([id_articolo, codice_lotto_fornitore, fornitore, data_scadenza]):
-        flash('I campi obbligatori (Prodotto, Lotto, Fornitore, Scadenza) non sono stati compilati.', 'error')
-        return redirect(url_for('carico'))
-
-    # Validazione formato e data di scadenza
-    try:
-        data_scad_parsed = datetime.datetime.strptime(data_scadenza, '%Y-%m-%d').date()
-    except ValueError:
-        flash('Formato data di scadenza non valido.', 'error')
-        return redirect(url_for('carico'))
-
-    if data_scad_parsed < datetime.date.today():
-        flash('La data di scadenza non può essere nel passato.', 'error')
+    if not id_articolo or not codice_lotto_fornitore or not fornitore:
+        flash('I campi obbligatori (Prodotto, Lotto, Fornitore) devono essere compilati.', 'error')
         return redirect(url_for('carico'))
 
     conn = get_db_connection()
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            # 1. Recupera la categoria dell'articolo dal DB
+            cursor.execute("SELECT id_articolo, denominazione, categoria FROM ARTICOLO WHERE id_articolo = %s;", (id_articolo,))
+            articolo = cursor.fetchone()
+
+            if not articolo:
+                flash('Articolo selezionato non valido o inesistente.', 'error')
+                return redirect(url_for('carico'))
+
+            categoria = (articolo['categoria'] or '').strip().lower()
+            is_carne = categoria in ['bovino', 'suino', 'avicolo']
+
+            # Parsing e validazione date
+            data_scad_parsed = None
+            if data_scadenza_str:
+                try:
+                    data_scad_parsed = datetime.datetime.strptime(data_scadenza_str, '%Y-%m-%d').date()
+                except ValueError:
+                    flash('Formato data di scadenza non valido.', 'error')
+                    return redirect(url_for('carico'))
+                if data_scad_parsed < datetime.date.today():
+                    flash('La data di scadenza non può essere nel passato.', 'error')
+                    return redirect(url_for('carico'))
+
+            data_macell_parsed = None
+            if data_macellazione_str:
+                try:
+                    data_macell_parsed = datetime.datetime.strptime(data_macellazione_str, '%Y-%m-%d').date()
+                except ValueError:
+                    flash('Formato data di macellazione non valido.', 'error')
+                    return redirect(url_for('carico'))
+                if data_macell_parsed > datetime.date.today():
+                    flash('La data di macellazione non può essere nel futuro.', 'error')
+                    return redirect(url_for('carico'))
+
+            if data_scad_parsed and data_macell_parsed and data_scad_parsed < data_macell_parsed:
+                flash('La data di scadenza non può essere precedente alla data di macellazione.', 'error')
+                return redirect(url_for('carico'))
+
+            # 2. Validazione condizionale
+            if is_carne:
+                # Per le carni: paesi obbligatori
+                if not all([paese_nascita, paese_allevamento, paese_macellazione, paese_sezionamento]):
+                    flash('Per le categorie carni (Bovino, Suino, Avicolo) tutti i campi di origine (Nato, Allevato, Macellato, Sezionato) sono obbligatori.', 'error')
+                    return redirect(url_for('carico'))
+                # Per le carni: almeno una data tra macellazione e scadenza obbligatoria
+                if not data_macell_parsed and not data_scad_parsed:
+                    flash('Per le categorie carni è obbligatorio inserire almeno una data tra Data Macellazione e Data Scadenza.', 'error')
+                    return redirect(url_for('carico'))
+            else:
+                # Per le altre categorie: data_scadenza obbligatoria
+                if not data_scad_parsed:
+                    flash('I campi obbligatori (Prodotto, Lotto, Fornitore, Scadenza) non sono stati compilati.', 'error')
+                    return redirect(url_for('carico'))
+                # Sanitizzazione campi origine per non-carne
+                paese_nascita = None
+                paese_allevamento = None
+                paese_macellazione = None
+                paese_sezionamento = None
+                data_macell_parsed = None
+
+            # 3. Inserimento in LOTTO_MADRE (9 colonne)
             cursor.execute("""
                 INSERT INTO LOTTO_MADRE (
                     id_articolo, codice_lotto_fornitore, fornitore, data_scadenza, 
-                    paese_nascita, paese_allevamento, paese_macellazione, paese_sezionamento
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    paese_nascita, paese_allevamento, paese_macellazione, paese_sezionamento,
+                    data_macellazione
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 id_articolo, codice_lotto_fornitore, fornitore, data_scad_parsed, 
-                paese_nascita, paese_allevamento, paese_macellazione, paese_sezionamento
+                paese_nascita, paese_allevamento, paese_macellazione, paese_sezionamento,
+                data_macell_parsed
             ))
         conn.commit()
         flash('Carico merce registrato con successo.', 'success')
@@ -326,7 +397,7 @@ def produci_preparato(id_articolo):
                 # Cerca lotto madre: prima quelli del giorno, poi i più recenti caricati in generale
                 cursor.execute("""
                     SELECT id_lotto_madre FROM LOTTO_MADRE 
-                    WHERE id_articolo = %s AND data_scadenza >= CURRENT_DATE
+                    WHERE id_articolo = %s AND (data_scadenza IS NULL OR data_scadenza >= CURRENT_DATE)
                     ORDER BY data_carico DESC LIMIT 1
                 """, (id_ing,))
                 lotto_madre = cursor.fetchone()
@@ -407,6 +478,7 @@ def stampa_etichetta_taglio(id_lotto_madre):
             cursor.execute("""
                 SELECT 
                     lm.id_lotto_madre, lm.codice_lotto_fornitore, lm.data_carico, lm.data_scadenza,
+                    lm.data_macellazione,
                     lm.paese_nascita, lm.paese_allevamento, lm.paese_macellazione, lm.paese_sezionamento,
                     a.denominazione, a.categoria, a.tipo_categoria
                 FROM LOTTO_MADRE lm

@@ -14,7 +14,8 @@ CREATE TABLE LOTTO_MADRE (
     codice_lotto_fornitore VARCHAR(100) NOT NULL,
     fornitore VARCHAR(255) NOT NULL,
     data_carico TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_scadenza DATE NOT NULL,
+    data_scadenza DATE,
+    data_macellazione DATE,
     paese_nascita VARCHAR(100),       -- o VARCHAR(3) se usi solo sigle ISO come ITA
     paese_allevamento VARCHAR(100),     -- o VARCHAR(3) se usi solo sigle ISO come ITA
     paese_macellazione VARCHAR(100),

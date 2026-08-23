@@ -1,39 +1,63 @@
-# Sentinel Handoff Report
+# Sentinel Handoff Report: Dynamic Carico Merci & HACCP Traceability
 
-**Project**: Gestionale Macelleria — Residual Fixes & Schema Alignment (R1, R2, R3)  
-**Date**: 2026-08-22  
-**Status**: VICTORY CONFIRMED  
-**Deliverables**:
-- `.env.example`
-- `database.sql` (aligned DMLs)
-- `README.md` (updated Excel generation docs)
+**Date**: 2026-08-23T11:12:44Z  
+**Verdict**: VICTORY CONFIRMED  
+**Route**: General (`teamwork_preview_orchestrator`)  
 
 ---
 
 ## 1. Observation
-The user requested 3 targeted residual fixes identified from previous analysis:
-1. R1: Creation of `.env.example` with `DATABASE_URL` and `SECRET_KEY` template variables and Italian comments.
-2. R2: Aligning `database.sql` DMLs with actual database schema (removing `flg_lotto_del_giorno` from LOTTO_MADRE DML, removing `versione` from 4 RICETTA INSERTs, and replacing `'LOTTO_DEFAULT'` with regex-safe `'LOTTO-DEFAULT'`).
-3. R3: Updating `README.md` to reflect on-demand Excel HACCP generation upon download.
-Integrity constraints required that `app.py` and other files remain untouched.
+
+All requirements (R1, R2, R3, R4) and acceptance criteria have been verified and independently audited:
+
+1. **Frontend (`templates/carico.html`)**:
+   - `<option>` tags inside `<optgroup>` elements now include `data-categoria="{{ categoria }}"`.
+   - Dedicated `#sezione-tracciabilita` section styled with distinctive red HACCP theme (`bg-red-50/50`, `border-2 border-red-300`, `rounded-xl`, uppercase title, badge).
+   - Pure vanilla JavaScript client-side handler dynamically toggles `#sezione-tracciabilita` display and manages `required` attribute constraints on `id_articolo` selection and on `DOMContentLoaded` in 0ms without page reload or AJAX calls.
+   - Initial load (no article selected) and non-meat categories keep the section hidden.
+
+2. **Database & Migrations (`database.sql`, `app.py`)**:
+   - `LOTTO_MADRE` table schema updated with `data_macellazione DATE NULL` and nullable `data_scadenza DATE`.
+   - `app.py` includes idempotent startup DDL migration (`init_db_migrations()`).
+   - `/salva_carico` query uses a 9-column parameterized `INSERT INTO LOTTO_MADRE`.
+
+3. **Backend Conditional Validation (`app.py`)**:
+   - Authoritatively retrieves article `categoria` from the DB.
+   - For Meat (`Bovino`, `Suino`, `Avicolo`): strictly enforces 4 origin country fields (`paese_nascita`, `paese_allevamento`, `paese_macellazione`, `paese_sezionamento`) and at least one between `data_macellazione` and `data_scadenza`.
+   - For Non-Meat: enforces `data_scadenza` and automatically sanitizes origin/slaughter fields to `None` (`NULL`).
+   - Date validation: prevents future slaughter dates, past expiration dates, and slaughter dates occurring after expiration dates.
+
+4. **Non-Regression & Verification**:
+   - Comprehensive multi-agent review and adversarial testing passed across 53 automated test cases (17 verification tests, 25 boundary/stress tests, 11 E2E tests).
+   - Independent Victory Auditor confirmed zero regressions across `/magazzino`, `/stampa_etichetta_taglio`, `/produci_preparato`, and `/download_excel`.
+
+---
 
 ## 2. Logic Chain
-1. Recorded request in `.agents/ORIGINAL_REQUEST.md`.
-2. Evaluated routing: matched SWE Light (`teamwork_preview_swe`) due to explicit user instruction ("single self-contained fix; keep it small and focused").
-3. Dispatched `teamwork_preview_swe` which ran implementation followed by 3 rounds of adversarial review.
-4. Active liveness and progress crons monitored subagent progress.
-5. Upon victory claim from `teamwork_preview_swe`, Sentinel dispatched an independent `teamwork_preview_victory_auditor` for a blocking 3-phase audit.
-6. Victory Auditor confirmed 100% compliance across all requirements and repository integrity with `VERDICT: VICTORY CONFIRMED`.
-7. Cancelled all monitoring crons and terminated all subagents per protocol.
 
-## 3. Caveats & Critical Notes
-- The DDL for `LOTTO_MADRE` still contains `flg_lotto_del_giorno` definition for backwards compatibility with `app.py`, while DML inserts have been cleanly adapted.
-- `app.py` was strictly preserved without any alterations.
+- **Client-Side Toggle**: The client reads `data-categoria` on selection change, updating `#sezione-tracciabilita` display and dynamically setting input required states, satisfying R1 and R4.
+- **Data Integrity**: Idempotent startup migrations ensure existing installations and clean `database.sql` initializations both have `data_macellazione DATE NULL`, satisfying R2.
+- **HACCP Compliance**: Category lookup from the DB ensures that client-side DOM manipulations cannot bypass mandatory meat traceability checks, satisfying R3.
+
+---
+
+## 3. Caveats
+
+- In `templates/footer.html`, a legacy script references `#searchInput` which only exists on `index.html`. This creates a benign console warning on non-index pages that does not impact any functionality.
+
+---
 
 ## 4. Conclusion
-All acceptance criteria for R1, R2, and R3 have been satisfied and independently verified.
+
+All acceptance criteria (R1, R2, R3, R4) have been satisfied and independently verified with a confirmed victory verdict.
+
+---
 
 ## 5. Verification Method
-- Independent post-victory audit (timeline review, full diff integrity scan, static schema/DML/regex checks).
-- Full audit report at `C:\Users\david\Desktop\Gestionale_Macelleria\.agents\victory_auditor_sentinel\handoff.md`.
+
+- Verification tests: `python test_carico_verification.py` (17 tests)
+- Boundary & stress tests: `python test_carico_boundary_stress.py` (25 tests)
+- E2E challenger tests: `python test_carico_e2e_challenger.py` (11 tests)
+- Independent Victory Auditor verdict: `VICTORY CONFIRMED` (zero regressions, zero integrity violations).
+- Audit report: `c:\Users\david\Desktop\Gestionale_Macelleria\.agents\victory_auditor_2\handoff.md`.
 

@@ -143,11 +143,19 @@
     <div class="dates-grid font-bold">
         <div>
             <div style="font-size: 10px; font-weight: normal;">Confezionato il:</div>
-            {{ taglio.data_carico.strftime('%d/%m/%Y') }}
+            {{ taglio.data_carico.strftime('%d/%m/%Y') if taglio.data_carico else 'N/D' }}
         </div>
         <div class="text-right">
-            <div style="font-size: 10px; font-weight: normal;">Da cons. entro:</div>
-            {{ taglio.data_scadenza.strftime('%d/%m/%Y') }}
+            {% if taglio.data_scadenza %}
+                <div style="font-size: 10px; font-weight: normal;">Da cons. entro:</div>
+                {{ taglio.data_scadenza.strftime('%d/%m/%Y') }}
+            {% elif taglio.data_macellazione %}
+                <div style="font-size: 10px; font-weight: normal;">Macellato il:</div>
+                {{ taglio.data_macellazione.strftime('%d/%m/%Y') }}
+            {% else %}
+                <div style="font-size: 10px; font-weight: normal;">Da cons. entro:</div>
+                N/D
+            {% endif %}
         </div>
     </div>
 

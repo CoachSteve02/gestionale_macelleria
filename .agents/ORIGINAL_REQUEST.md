@@ -78,3 +78,68 @@ La documentazione esistente afferma che il file Excel HACCP viene rigenerato aut
 - [ ] Nessun altro file del repository è stato modificato oltre a quelli elencati nei requirement.
 - [ ] `app.py` non è stato toccato.
 
+## Follow-up — 2026-08-23T10:57:09Z
+
+Rendere dinamica la pagina "Carico Merci" del gestionale da macelleria (Flask 3.0 + PostgreSQL + Jinja2 + Tailwind CSS + vanilla JS). Il form deve mostrare dinamicamente sezioni di campi differenti in base al prodotto selezionato: campi di tracciabilità avanzata obbligatori per le categorie carni (Bovino, Suino, Avicolo), form semplificato per tutte le altre categorie. Il cambio di visibilità deve avvenire lato client (show/hide CSS) senza ricaricamento pagina né chiamate AJAX.
+
+Working directory: c:\Users\david\Desktop\Gestionale_Macelleria
+Integrity mode: demo
+
+---
+
+## Context tecnico
+
+- **Stack**: Flask 3.0, PostgreSQL (psycopg2), Jinja2, Tailwind CSS (CDN), vanilla JS (nessun framework JS)
+- **Tabella chiave**: `LOTTO_MADRE` — contiene i carichi da fornitore
+- **Colonne già presenti** in `LOTTO_MADRE`: `paese_nascita`, `paese_allevamento`, `paese_macellazione`, `paese_sezionamento`
+- **Colonna mancante** da aggiungere: `data_macellazione DATE` (nullable)
+- **Discriminante categoria**: campo `categoria` (stringa) nella tabella `ARTICOLO`
+  - Categorie carne (tracciabilità avanzata): **Bovino, Suino, Avicolo**
+  - Tutte le altre categorie: form semplificato (solo Lotto + Fornitore + Scadenza)
+- **Route GET** `/carico`: popola il select con articoli `TAGLIO` e `VARIO`, raggruppati per `categoria`
+- **Route POST** `/salva_carico`: inserisce in `LOTTO_MADRE`, validazione base attuale
+- **File di interesse**: `app.py`, `templates/carico.html`, `database.sql`
+
+---
+
+## Requirements
+
+### R1. Form dinamico lato client
+Quando l'utente seleziona un prodotto nel `<select>`, il form mostra o nasconde la sezione "Tracciabilità Carne" in base alla `categoria` del prodotto selezionato. Le categorie carne (Bovino, Suino, Avicolo) mostrano i campi: `paese_nascita`, `paese_allevamento`, `paese_macellazione`, `paese_sezionamento`, `data_macellazione`. Le altre categorie mostrano solo i campi base. Il meccanismo è client-side (show/hide CSS) senza ricaricamento pagina. La `categoria` deve essere accessibile al JavaScript (es. come `data-categoria` sulle `<option>`).
+
+### R2. Migrazione DB e aggiornamento INSERT
+Aggiungere la colonna `data_macellazione DATE NULL` alla tabella `LOTTO_MADRE`. Fornire sia lo statement SQL di migrazione (`ALTER TABLE`) sia l'aggiornamento del file `database.sql`. Aggiornare la query INSERT in `salva_carico` per includere questa nuova colonna.
+
+### R3. Validazione condizionale backend
+La route `/salva_carico` deve leggere la `categoria` dell'articolo selezionato dal DB e applicare validazione condizionale: se la categoria è Bovino, Suino o Avicolo, i campi `paese_nascita`, `paese_allevamento`, `paese_macellazione` e `paese_sezionamento` sono obbligatori e deve essere presente almeno uno tra `data_macellazione` e `data_scadenza`. Per le altre categorie, questi campi rimangono facoltativi. I messaggi di errore flash esistenti devono essere coerenti con la nuova logica.
+
+### R4. UX e coerenza visuale
+La sezione "Tracciabilità Carne" deve avere un'intestazione visiva distinta (es. bordo colorato, label specifica) che indichi all'operatore che sta compilando dati HACCP obbligatori. Il comportamento deve essere coerente con lo stile Tailwind CSS già adottato nel progetto.
+
+---
+
+## Acceptance Criteria
+
+### Comportamento frontend
+- [ ] Selezionando un articolo di categoria "Bovino", "Suino" o "Avicolo", la sezione tracciabilità carne appare immediatamente senza ricaricamento pagina
+- [ ] Selezionando qualsiasi altro articolo (es. "Spezie", "Latticini"), la sezione tracciabilità carne è nascosta e i suoi campi non vengono inviati come required
+- [ ] Il form al caricamento iniziale (nessun prodotto selezionato) non mostra la sezione tracciabilità
+
+### Validazione backend
+- [ ] POST con categoria carne e campi paese mancanti → flash error, redirect a `/carico`, nessun inserimento in DB
+- [ ] POST con categoria carne e tutti i campi compilati → record inserito correttamente in `LOTTO_MADRE` inclusa `data_macellazione`
+- [ ] POST con categoria non-carne e campi paese vuoti → record inserito correttamente (campi nullable salvati come NULL)
+
+### Database
+- [ ] La colonna `data_macellazione DATE NULL` esiste in `LOTTO_MADRE` dopo la migrazione
+- [ ] Il file `database.sql` riflette lo schema aggiornato (utile per setup da zero)
+
+### Integrità codice
+- [ ] Nessuna regressione sulle route esistenti (`/magazzino`, `/etichetta`, `/etichetta_taglio`)
+- [ ] L'app Flask si avvia senza errori dopo le modifiche
+
+---
+
+*Nota per il team: non creare test framework da zero. Verificare il funzionamento eseguendo l'app Flask localmente (`python app.py`) e testando manualmente le route GET e POST. Il DB di sviluppo è su PostgreSQL configurato via `.env`.*
+
+
