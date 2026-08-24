@@ -1,77 +1,74 @@
 {% include 'header.html' %}
 
-        <main class='flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 overflow-y-auto'> 
+        <main class='flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 p-6 overflow-y-auto'>
             
-            <!-- Box Rosso: Tagli -->
-                <section class='bg-white rounded-xl shadow-sm border-t-8 border-red-600 flex flex-col'> 
-                    <div class='p-3 bg-red-50 border-b border-red-100 flex justify-between items-center shrink-0'> 
-                        <h2 class='font-black text-red-700 uppercase tracking-tighter text-xl'>Tagli Freschi</h2> 
-                    </div> 
-                    <div class='flex-1 p-3 grid grid-cols-1 gap-2 overflow-y-auto content-start'> 
-                        {% for item in catalogo.get('TAGLIO', []) %}
-                        <div class='product-item bg-slate-50 border-2 border-slate-200 p-4 rounded-lg flex justify-between items-center shadow-sm' data-name="{{ item.denominazione | lower | e }}"> 
-                            <div> 
-                                <p class='font-bold text-slate-900 text-lg'>{{ item.denominazione }}</p> 
-                                <p class='text-xs text-slate-500'>ID: {{ item.id_articolo }} | {{ item.categoria }}</p> 
-                            </div> 
-                            <div class="flex items-center gap-3">
-                                {% if item.id_ultimo_lotto_madre %}
-                                <a href="{{ url_for('stampa_etichetta_taglio', id_lotto_madre=item.id_ultimo_lotto_madre) }}"
-                                class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded uppercase tracking-wide transition-colors whitespace-nowrap">
-                                    🖨️ Stampa
-                                </a>
-                                {% else %}
-                                <span class="text-[10px] text-orange-500 font-bold uppercase text-right leading-tight">Nessun<br>lotto</span>
-                                {% endif %}
-                                <span class='text-2xl'>🥩</span>
-                            </div>
-                        </div> 
-                        {% endfor %}
-                    </div> 
-                </section>
+            <!-- Tagli Freschi -->
+            <section class='bg-white rounded-lg border border-gray-200 shadow-sm flex flex-col'>
+                <div class='px-5 py-3 border-b border-gray-100 flex justify-between items-center shrink-0'>
+                    <h2 class='font-semibold text-gray-700 text-sm'>Tagli</h2>
+                </div>
+                <div class='flex-1 p-3 grid grid-cols-1 gap-2 overflow-y-auto content-start'>
+                    {% for item in catalogo.get('TAGLIO', []) %}
+                    <div class='product-item bg-white border border-gray-200 p-3 rounded-lg flex justify-between items-center hover:bg-gray-50 transition-colors' data-name="{{ item.denominazione | lower | e }}">
+                        <div>
+                            <p class='font-medium text-gray-800 text-sm'>{{ item.denominazione }}</p>
+                            <p class='text-xs text-gray-400 mt-0.5'>ID: {{ item.id_articolo }} · {{ item.categoria }}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            {% if item.id_ultimo_lotto_madre %}
+                            <a href="{{ url_for('stampa_etichetta_taglio', id_lotto_madre=item.id_ultimo_lotto_madre) }}"
+                            class="bg-gray-800 hover:bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-md transition-colors whitespace-nowrap">
+                                Stampa
+                            </a>
+                            {% else %}
+                            <span class="text-[10px] text-amber-500 font-medium">Nessun lotto</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
 
-            <!-- Box Arancione: Preparati -->
-            <section class='bg-white rounded-xl shadow-sm border-t-8 border-amber-600 flex flex-col'> 
-                <div class='p-3 bg-amber-50 border-b border-amber-100 flex justify-between items-center shrink-0'> 
-                    <h2 class='font-black text-amber-700 uppercase tracking-tighter text-xl'>Preparati (1-Click)</h2> 
-                    <span class='bg-amber-600 text-white text-xs px-2 py-1 rounded font-bold'>RAPIDO</span> 
-                </div> 
-                <div class='flex-1 p-3 grid grid-cols-1 gap-3 overflow-y-auto content-start'> 
+            <!-- Preparati -->
+            <section class='bg-white rounded-lg border border-gray-200 shadow-sm flex flex-col'>
+                <div class='px-5 py-3 border-b border-gray-100 flex justify-between items-center shrink-0'>
+                    <h2 class='font-semibold text-gray-700 text-sm'>Preparati</h2>
+                    <span class='bg-amber-50 text-amber-600 text-xs px-2 py-0.5 rounded-full font-medium border border-amber-200'>1-Click</span>
+                </div>
+                <div class='flex-1 p-3 grid grid-cols-1 gap-2 overflow-y-auto content-start'>
                     {% for item in catalogo.get('PREPARATO', []) %}
                     <form action="{{ url_for('produci_preparato', id_articolo=item.id_articolo) }}" method="POST" class="product-item m-0" data-name="{{ item.denominazione | lower | e }}">
-                        <button type="submit" class='w-full bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 p-4 rounded-xl flex flex-col justify-center items-center active:scale-95 transition-transform cursor-pointer'> 
-                            <p class='font-black text-amber-900 text-xl'>{{ item.denominazione|upper }}</p> 
-                            <p class='text-xs text-amber-700 font-bold mt-1 uppercase underline'>Produci Lotto Interno</p> 
-                        </button> 
+                        <button type="submit" class='w-full bg-amber-50 hover:bg-amber-100 border border-amber-200 p-3 rounded-lg flex flex-col justify-center items-center active:scale-[0.98] transition-all cursor-pointer'>
+                            <p class='font-semibold text-amber-900 text-sm'>{{ item.denominazione }}</p>
+                            <p class='text-xs text-amber-600 font-medium mt-1'>Produci lotto interno</p>
+                        </button>
                     </form>
                     {% endfor %}
-                </div> 
-            </section> 
+                </div>
+            </section>
 
-            <!-- Box Grigio: Vari -->
-            <section class='bg-white rounded-xl shadow-sm border-t-8 border-slate-500 flex flex-col'> 
-                <div class='p-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center shrink-0'> 
-                    <h2 class='font-black text-slate-700 uppercase tracking-tighter text-xl'>Vari / Ingredienti</h2> 
-                </div> 
-                <div class='flex-1 p-3 grid grid-cols-1 gap-2 overflow-y-auto content-start'> 
+            <!-- Vari / Ingredienti -->
+            <section class='bg-white rounded-lg border border-gray-200 shadow-sm flex flex-col'>
+                <div class='px-5 py-3 border-b border-gray-100 flex justify-between items-center shrink-0'>
+                    <h2 class='font-semibold text-gray-700 text-sm'>Ingredienti</h2>
+                </div>
+                <div class='flex-1 p-3 grid grid-cols-1 gap-2 overflow-y-auto content-start'>
                     {% for item in catalogo.get('VARIO', []) %}
-                    <div class='product-item p-3 border-l-4 border-slate-400 bg-slate-50 flex justify-between items-center shadow-sm' data-name="{{ item.denominazione | lower | e }}"> 
-                        <div> 
-                            <p class='font-bold text-sm'>{{ item.denominazione }}</p> 
-                            <p class='text-[10px] text-slate-400 uppercase'>ID: {{ item.id_articolo }} | {{ item.categoria }}</p> 
-                        </div> 
-                        <div class='text-right'> 
+                    <div class='product-item p-3 border-l-2 border-gray-200 bg-white flex justify-between items-center hover:bg-gray-50 transition-colors' data-name="{{ item.denominazione | lower | e }}">
+                        <div>
+                            <p class='font-medium text-gray-700 text-sm'>{{ item.denominazione }}</p>
+                            <p class='text-[10px] text-gray-400 mt-0.5'>ID: {{ item.id_articolo }} · {{ item.categoria }}</p>
+                        </div>
+                        <div class='text-right'>
                             {% if item.allergeni %}
-                            <p class='text-[10px] font-bold text-orange-600 underline uppercase'>ALLERG: SI</p> 
-                            {% else %}
-                            <p class='text-[10px] font-bold text-slate-400 uppercase'>ALLERG: NO</p> 
+                            <span class='text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded'>Allergeni</span>
                             {% endif %}
-                        </div> 
-                    </div> 
+                        </div>
+                    </div>
                     {% endfor %}
-                </div> 
-            </section> 
+                </div>
+            </section>
 
-        </main> 
+        </main>
 
 {% include 'footer.html' %}

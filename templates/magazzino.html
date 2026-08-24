@@ -1,61 +1,60 @@
 {% include 'header.html' %}
-<main class='flex-1 p-4 overflow-y-auto w-full max-w-6xl mx-auto'> 
+<main class='flex-1 p-6 overflow-y-auto w-full max-w-5xl mx-auto'>
             
-            <section class='bg-white rounded-xl shadow-sm border-t-8 border-slate-700 flex flex-col p-0 overflow-hidden'> 
-                <div class='p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center shrink-0'> 
-                    <h2 class='font-black text-slate-800 uppercase tracking-tighter text-2xl'>Giacenze Lotti Madre</h2> 
-                </div> 
+            <section class='bg-white rounded-lg border border-gray-200 shadow-sm flex flex-col overflow-hidden'>
+                <div class='px-6 py-4 border-b border-gray-100 shrink-0'>
+                    <h2 class='font-semibold text-gray-800 text-xl'>Giacenze Lotti Madre</h2>
+                    <p class='text-sm text-gray-400 mt-0.5'>Tutti i lotti attualmente in magazzino</p>
+                </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-100 border-b-2 border-slate-200 text-slate-600 uppercase text-xs tracking-wider font-bold">
-                                <th class="p-4">ID Lotto</th>
-                                <th class="p-4">Prodotto</th>
-                                <th class="p-4">Categoria</th>
-                                <th class="p-4">Fornitore</th>
-                                <th class="p-4">Cod. Fornitore</th>
-                                <th class="p-4">Data Carico</th>
-                                <th class="p-4">Scadenza</th>
-                                <th class="p-4 text-right">Azioni</th>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wide font-medium">
+                                <th class="px-4 py-3">ID</th>
+                                <th class="px-4 py-3">Prodotto</th>
+                                <th class="px-4 py-3">Tipo</th>
+                                <th class="px-4 py-3">Fornitore</th>
+                                <th class="px-4 py-3">Cod. Lotto</th>
+                                <th class="px-4 py-3">Data Carico</th>
+                                <th class="px-4 py-3">Scadenza</th>
+                                <th class="px-4 py-3 text-right">Azioni</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm">
                             {% for lotto in giacenze %}
-                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                <td class="p-4 font-mono font-bold text-slate-500">#{{ lotto.id_lotto_madre }}</td>
-                                <td class="p-4 font-bold text-slate-900">{{ lotto.denominazione }}</td>
-                                <td class="p-4">
+                            <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                                <td class="px-4 py-3 font-mono text-gray-400 text-xs">#{{ lotto.id_lotto_madre }}</td>
+                                <td class="px-4 py-3 font-medium text-gray-800">{{ lotto.denominazione }}</td>
+                                <td class="px-4 py-3">
                                     {% if lotto.tipo_categoria == 'TAGLIO' %}
-                                        <span class="bg-red-100 text-red-800 font-bold px-2 py-1 rounded text-xs uppercase tracking-wider border border-red-200">TAGLIO</span>
+                                        <span class="bg-red-50 text-red-600 font-medium px-2 py-0.5 rounded text-xs">Taglio</span>
                                     {% else %}
-                                        <span class="bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded text-xs uppercase tracking-wider border border-slate-300">VARIO</span>
+                                        <span class="bg-gray-100 text-gray-500 font-medium px-2 py-0.5 rounded text-xs">Vario</span>
                                     {% endif %}
                                 </td>
-                                <td class="p-4 text-slate-700">{{ lotto.fornitore }}</td>
-                                <td class="p-4 font-mono text-slate-600">{{ lotto.codice_lotto_fornitore }}</td>
-                                <td class="p-4 text-slate-600">{{ lotto.data_carico.strftime('%d/%m/%Y') if lotto.data_carico else '-' }}</td>
-                                <td class="p-4 font-bold text-slate-800">{{ lotto.data_scadenza.strftime('%d/%m/%Y') if lotto.data_scadenza else '-' }}</td>
-                                <td class="p-4 text-right">
+                                <td class="px-4 py-3 text-gray-600">{{ lotto.fornitore }}</td>
+                                <td class="px-4 py-3 font-mono text-gray-500 text-xs">{{ lotto.codice_lotto_fornitore }}</td>
+                                <td class="px-4 py-3 text-gray-500">{{ lotto.data_carico.strftime('%d/%m/%Y') if lotto.data_carico else '—' }}</td>
+                                <td class="px-4 py-3 font-medium text-gray-700">{{ lotto.data_scadenza.strftime('%d/%m/%Y') if lotto.data_scadenza else '—' }}</td>
+                                <td class="px-4 py-3 text-right">
                                     {% if lotto.tipo_categoria == 'TAGLIO' %}
-                                    <a href="{{ url_for('stampa_etichetta_taglio', id_lotto_madre=lotto.id_lotto_madre) }}" class="inline-flex items-center justify-center bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded text-xs uppercase tracking-wide transition-colors">
-                                        🖨️ Stampa Etichetta
+                                    <a href="{{ url_for('stampa_etichetta_taglio', id_lotto_madre=lotto.id_lotto_madre) }}" class="inline-flex items-center bg-gray-800 hover:bg-gray-900 text-white font-medium py-1.5 px-3 rounded-md text-xs transition-colors">
+                                        Stampa
                                     </a>
                                     {% endif %}
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="8" class="text-center p-8 text-slate-500 font-bold text-lg">Nessun lotto presente in magazzino.</td>
+                                <td colspan="8" class="text-center py-12 text-gray-400 text-sm">Nessun lotto presente in magazzino.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
-            </section> 
+            </section>
 
-        </main> 
+        </main>
 {% include 'footer.html' %}
-
-

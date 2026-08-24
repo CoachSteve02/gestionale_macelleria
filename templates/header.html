@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <style>
-        body { margin: 0; height: 100%; display: flex; flex-direction: column; overflow: hidden; background-color: #f1f5f9; }
+        body { margin: 0; height: 100%; display: flex; flex-direction: column; overflow: hidden; background-color: #f9fafb; }
         .h-full { height: 100%; }
         .w-full { width: 100%; }
         .flex { display: flex; }
@@ -16,46 +16,42 @@
     </style>
 </head>
 <body>
-    <div id='app-root' class='flex flex-col h-full w-full bg-slate-100 font-sans overflow-hidden'> 
+    <div id='app-root' class='flex flex-col h-full w-full bg-gray-50 font-sans overflow-hidden'>
         
-        <header class='bg-slate-900 text-white p-4 flex justify-between items-center shadow-lg shrink-0'> 
-            <div class='flex items-center space-x-4'> 
-                <div class='bg-red-600 p-2 rounded-lg'> 
-                    <svg class='w-8 h-8 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4'></path></svg> 
-                </div> 
-                <h1 class='text-2xl font-black tracking-tight'>GESTIONALE MACELLERIA <span class='text-slate-400 font-normal text-lg ml-2'>v2.7 HACCP</span></h1> 
-            </div> 
-        </header> 
+        <header class='bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shrink-0'>
+            <div class='flex items-center gap-3'>
+                <svg class='w-6 h-6 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4'></path></svg>
+                <h1 class='text-lg font-semibold text-gray-700 tracking-tight'>Gestionale Macelleria</h1>
+                <span class='text-xs text-gray-400 border border-gray-200 px-2 py-0.5 rounded font-medium'>v2.7 HACCP</span>
+            </div>
+        </header>
         
-        <nav class='bg-white border-b border-slate-200 flex space-x-1 p-2 shrink-0 overflow-x-auto'> 
-            <!-- 1. VETRINA / PRODUZIONE -->
+        <nav class='bg-white border-b border-gray-100 flex gap-8 px-6 shrink-0'>
             <a href="{{ url_for('index') }}" 
-                class="flex-1 py-4 rounded-lg font-bold text-lg text-center uppercase whitespace-nowrap px-4 transition-colors
-                    {{ 'bg-slate-900 text-white border-b-4 border-slate-700' if request.endpoint == 'index' else 'bg-slate-200 text-slate-700 hover:bg-slate-300' }}">
-                1. Vetrina / Produzione
-            </a> 
+                class="py-3 text-sm font-medium border-b-2 transition-colors
+                    {{ 'border-gray-800 text-gray-900' if request.endpoint == 'index' else 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Vetrina / Produzione
+            </a>
             
-            <!-- 2. CARICO MERCE -->
             <a href="{{ url_for('carico') }}" 
-                class="flex-1 py-4 rounded-lg font-bold text-lg text-center uppercase whitespace-nowrap px-4 transition-colors
-                    {{ 'bg-slate-900 text-white border-b-4 border-slate-700' if request.endpoint == 'carico' else 'bg-slate-200 text-slate-700 hover:bg-slate-300' }}">
-                2. Carico Merce
-            </a> 
+                class="py-3 text-sm font-medium border-b-2 transition-colors
+                    {{ 'border-gray-800 text-gray-900' if request.endpoint == 'carico' else 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Carico Merce
+            </a>
             
-            <!-- 3. MAGAZZINO / LOTTI -->
             <a href="{{ url_for('magazzino') }}" 
-                class="flex-1 py-4 rounded-lg font-bold text-lg text-center uppercase whitespace-nowrap px-4 transition-colors
-                    {{ 'bg-slate-900 text-white border-b-4 border-slate-700' if request.endpoint == 'magazzino' else 'bg-slate-200 text-slate-700 hover:bg-slate-300' }}">
-                3. Magazzino / Lotti
-            </a> 
-        </nav> 
+                class="py-3 text-sm font-medium border-b-2 transition-colors
+                    {{ 'border-gray-800 text-gray-900' if request.endpoint == 'magazzino' else 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Magazzino / Lotti
+            </a>
+        </nav>
 
-        <div class="px-4 pt-4 shrink-0 flex flex-col gap-4">
+        <div class="px-6 pt-4 shrink-0 flex flex-col gap-3">
             <!-- Messaggi di sistema -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="p-4 rounded-lg font-bold text-lg {% if category == 'success' %}bg-green-100 text-green-800 border border-green-300{% else %}bg-red-100 text-red-800 border border-red-300{% endif %}">
+                        <div class="px-4 py-3 rounded-lg text-sm font-medium {% if category == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">
                             {{ message }}
                         </div>
                     {% endfor %}
@@ -66,8 +62,8 @@
             {% if request.endpoint == 'index' %}
             <div class="relative w-full max-w-md hidden sm:block">
                 <div class="relative w-full">
-                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-3xl">search</span>
-                    <input type="text" id="searchInput" placeholder="Ricerca rapida al banco (es. Macinata, Hamburger...)" class="w-full pl-14 pr-4 py-4 text-xl font-bold bg-white border-2 border-slate-300 rounded-xl focus:border-slate-800 focus:outline-none shadow-sm transition-colors text-slate-800 placeholder-slate-400">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">search</span>
+                    <input type="text" id="searchInput" placeholder="Ricerca rapida (es. Macinata, Hamburger...)" class="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-300 rounded-lg focus:border-gray-500 focus:outline-none shadow-sm transition-colors text-gray-700 placeholder-gray-400">
                 </div>
             </div>
             {% endif %}
